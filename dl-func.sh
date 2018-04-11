@@ -26,21 +26,24 @@ trap instance_plus EXIT;
 ERROR_CODE=254;
 cd ${HOME};
 
+# https://stackoverflow.com/a/10660730/5921729
+
 slack-send()
 {
-    local title=${1##*/};
-    local filename="${@:2}"
+    local title="${1##*/}";
+    local filename="${@:2}";
     if [ "$filename" = "\n" ] || [ "$filename" = "" ]; then
 	return;
     fi
+    local url=$(python3 -c "from urllib.parse import quote; print(quote(\"${1:8}\"))")
     local msg=$(cat <<EOF
       {
         "attachments": [
           {
             "color": "#36a64f",
-            "pretext": "<https://hare1039.nctu.me/sysvol${1:8}|$title> have updated", 
+            "pretext": "<https://hare1039.nctu.me/sysvol${url}|$title> have updated",
             "title": "Downloaded $title:",
-            "title_link": "https://hare1039.nctu.me/sysvol${1:8}",
+            "title_link": "https://hare1039.nctu.me/sysvol${url}",
             "text": "$filename"
           }
         ]
@@ -97,7 +100,7 @@ megadl_from()
 	    filename="$filename \n${line##*/}";
 	done <<< "$rawname";
 #	line "$title have updated.,$filename have been downloaded.";
-	slack-send $PWD $filename
+	slack-send "$PWD" "$filename"
 	echo "$title have updated";
 	err=0;
     fi
