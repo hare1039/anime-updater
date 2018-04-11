@@ -1,4 +1,4 @@
-trace_file=${HOME}/Documents/git_projects/mega-trace/rate.txt;
+trace_file=$SCRIPTPATH/rate.txt;
 line_buf_file=${HOME}/Documents/git_projects/line-buff/message.txt;
 instance_sub()
 {
