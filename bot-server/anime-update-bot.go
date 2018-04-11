@@ -64,6 +64,7 @@ func main(){
 	router.StaticFile("/AnimeUpdate/auth/add_to_slack.html", "./web/add_to_slack.html")
 	router.GET("/AnimeUpdate/auth/redirect", redirectHandler)
 	router.POST("/AnimeUpdate/slash-command/anime-updater", sendButtonHandler)
+	router.POST("/AnimeUpdate/action", actionHandler)
 	/////MONGOBD
 //	router.GET("/MusicServer/songlist", showSongListHandler)
 //	router.GET("/MusicServer/songlist/:listname", singleSongListHandler)
@@ -146,7 +147,24 @@ func sendButtonHandler(c *gin.Context){
 	}
 	
 }
+func actionHandler(c *gin.Context){
+	c.String(http.StatusOK, "")
+	payload := c.PostForm("payload")
+	payloadJSON, _ := gabs.ParseJSON([]byte(payload))
+//	log.Println(payloadJSON.StringIndent("", "    "))
+	response_url, _ := payloadJSON.Path("response_url").Data().(string)
+	user_name, _ := payloadJSON.Path("user.name").Data().(string)
+	action_array,_ :=payloadJSON.Path("actions").Children()
+	action_array_name, _ := action_array[0].Path("name").Data().(string)
+
+	messageJSON := gabs.New()
+	messageJSON.SetP(user_name + " clicked: " + action_array_name, "text")
+	messageJSON.SetP(false, "replace_original")
+	log.Println(messageJSON.String())
+	sendMessageToSlackResponseURL(response_url, []byte(messageJSON.String()))
+}
 func sendMessageToSlackResponseURL(url string, message []byte){
+	log.Println("POST to " + url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(message))
 	req.Header.Set("Content-Type", "application/json")
 	
