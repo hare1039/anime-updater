@@ -100,10 +100,43 @@
 	},
 	{
 		"title":"mahou-site",
-		"file_path":"/mnt/NAS/video/hare/mahou-site",
+		"file_path":"/mnt/NAS/video/hare/18spring/mahou-site",
 		"megaurl":[],
 		"gdurl":[
 			"https://drive.google.com/drive/folders/1aH3kpjbohc6VA1XiOhIWrTM1NHIi5i01"
+		]
+	},
+	{
+		"title":"waka-okami",
+		"file_path":"/mnt/NAS/video/hare/18spring/waka-okami",
+		"megaurl":[],
+		"gdurl":[
+			"https://drive.google.com/drive/folders/1dUugXoY68JfLSkjlQl9lJ6YMdW-VcZJK?usp=sharing"
+		]
+	},
+	{
+		"title":"comic-girl",
+		"file_path":"/mnt/NAS/video/hare/18spring/comic-girl",
+		"megaurl":[],
+		"gdurl":[
+		        "https://drive.google.com/drive/folders/1bhZO9-NE6FFnlh7aJTlT_UBWV5eectEU?usp=sharing",
+		        "https://drive.google.com/drive/folders/1ZSNOSoU2zXNERRrBZ7SiPUeCJYdZzNwv?usp=sharing"
+		]
+	},
+	{
+		"title":"akkun-kanojo",
+		"file_path":"/mnt/NAS/video/hare/18spring/akkun-kanojo",
+		"megaurl":[],
+		"gdurl":[
+			"https://drive.google.com/drive/folders/1ZGtqfoQf72VkQDxPViLpq-_-PCMwux2P?usp=sharing"
+		]
+	},
+	{
+		"title":"ALICE-OR-ALICE",
+		"file_path":"/mnt/NAS/video/hare/18spring/ALICE-OR-ALICE",
+		"megaurl":[],
+		"gdurl":[
+			"https://drive.google.com/drive/folders/1SNSHhgr84YWcjkiQhW5zjfhdYZNH3lQN?usp=sharing"
 		]
 	}
 ]
