@@ -1,7 +1,10 @@
 
-source ./dl-func.sh;
+SCRIPT=$(readlink -f "$0");
+SCRIPTPATH=$(dirname "$SCRIPT");
 
-list=$(cat ./list.json)
+source $SCRIPTPATH/dl-func.sh;
+
+list=$(cat $SCRIPTPATH/list.json)
 
 for row in $(echo "${list}" | jq -r '.[] | @base64'); do
     _jq() {
@@ -13,12 +16,12 @@ for row in $(echo "${list}" | jq -r '.[] | @base64'); do
    #echo $(_jq '.file_path');
    #cd $(_jq '.file_path');
    for url in $(_jq '.megaurl[]'); do
-	   cd $(_jq '.file_path');
+	   cd "$(_jq '.file_path')";
 	   #echo "megaurl: $url"
 	   megadl_from $url;
    done
    for url in $(_jq '.gdurl[]'); do
-	   cd $(_jq '.file_path');
+	   cd "$(_jq '.file_path')";
 	   #echo "gdurl: $url"
 	   gdrivedl_from $url;
    done
