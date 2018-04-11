@@ -15,14 +15,12 @@ for row in $(echo "${list}" | jq -r '.[] | @base64'); do
 
     #echo $(_jq '.file_path');
     #cd $(_jq '.file_path');
-    for url in $(_jq '.megaurl[]'); do
+    for url in $(_jq '.url[]'); do
 	cd "$(_jq '.file_path')";
-	#echo "megaurl: $url"
-	megadl_from $url;
-    done
-    for url in $(_jq '.gdurl[]'); do
-	cd "$(_jq '.file_path')";
-	#echo "gdurl: $url"
-	gdrivedl_from $url;
+	if [[ "$url" = *"mega"* ]]; then
+	    megadl_from $url;
+	elif [[ "$url" = *"google.com"* ]]; then
+	    gdrivedl_from $url;
+        fi
     done
 done
