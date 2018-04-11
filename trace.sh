@@ -1,6 +1,6 @@
 
 SCRIPT=$(readlink -f "$0");
-SCRIPTPATH=$(dirname "$SCRIPT");
+export SCRIPTPATH=$(dirname "$SCRIPT");
 
 source $SCRIPTPATH/dl-func.sh;
 
