@@ -35,9 +35,6 @@ megadl_from 'https://mega.nz/#F!TdoXhJLD!Q88MjXSTybGlYGBajhOs3Q';
 cd '/mnt/NAS/video/#連載中/立花館戀愛三角關係'
 megadl_from 'https://mega.nz/#F!jQpDHR7B!KoTx0wOyiRLpR5WlUNCp4w';
 
-cd '/mnt/NAS/video/#連載中/敦君與女朋友';
-#megadl_from 'https://mega.nz/#!HeAwBDgB!YsYzidUG0HfrIFOuluQrzkvPuTU0qV5sejd180DuVTE'
-
 cd '/mnt/NAS/video/#連載中/多田くんは戀をしない';
 megadl_from 'https://mega.nz/#F!6Roj2KJQ!ATYUgg1cqnbdJeZeFjNnUQ';
 
@@ -47,8 +44,25 @@ megadl_from 'https://mega.nz/#F!iHYhCBLC!ZxpklNrUn-gJQcb6c49x9Q';
 cd '/mnt/NAS/video/#連載中/魔法少女網站';
 megadl_from 'https://mega.nz/#F!7UAmEIoI!_n8s09A3bsYgasCoIgOcvg';
 
-cd '/mnt/NAS/video/hare/mahou-site';
+##<< google drive download >>##
+cd '/mnt/NAS/video/hare/18spring/mahou-site';
 gdrivedl_from 'https://drive.google.com/drive/folders/1aH3kpjbohc6VA1XiOhIWrTM1NHIi5i01';
+
+cd '/mnt/NAS/video/hare/18spring/waka-okami';
+gdrivedl_from 'https://drive.google.com/drive/folders/1dUugXoY68JfLSkjlQl9lJ6YMdW-VcZJK?usp=sharing';
+
+cd '/mnt/NAS/video/hare/18spring/comic-girl';
+gdrivedl_from 'https://drive.google.com/drive/folders/1bhZO9-NE6FFnlh7aJTlT_UBWV5eectEU?usp=sharing';
+
+cd '/mnt/NAS/video/hare/18spring/comic-girl';
+gdrivedl_from 'https://drive.google.com/drive/folders/1ZSNOSoU2zXNERRrBZ7SiPUeCJYdZzNwv?usp=sharing';
+
+cd '/mnt/NAS/video/hare/18spring/akkun-kanojo';
+gdrivedl_from 'https://drive.google.com/drive/folders/1ZGtqfoQf72VkQDxPViLpq-_-PCMwux2P?usp=sharing';
+
+cd '/mnt/NAS/video/hare/18spring/ALICE-OR-ALICE';
+gdrivedl_from 'https://drive.google.com/drive/folders/1SNSHhgr84YWcjkiQhW5zjfhdYZNH3lQN?usp=sharing';
+
 ##<< Not current season >>##
 
 

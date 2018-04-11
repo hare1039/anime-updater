@@ -29,7 +29,10 @@ cd ${HOME};
 slack-send()
 {
     local title=${1##*/};
-    local filename=$2
+    local filename="${@:2}"
+    if [ "$filename" = "\n" ] || [ "$filename" = "" ]; then
+	return;
+    fi
     local msg=$(cat <<EOF
       {
         "attachments": [
