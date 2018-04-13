@@ -16,6 +16,7 @@ import(
 	"gopkg.in/mgo.v2/bson"
 	"github.com/Jeffail/gabs"
 	"bytes"
+	//"strings"
 )
 /////const for MONGODB.
 var Host = []string{
@@ -65,6 +66,7 @@ func main(){
 	router.GET("/AnimeUpdate/auth/redirect", redirectHandler)
 	router.POST("/AnimeUpdate/slash-command/anime-updater", sendButtonHandler)
 	router.POST("/AnimeUpdate/action", actionHandler)
+	router.POST("/AnimeUpdate/eat-my-update", sendUpdateHandler)
 	/////MONGOBD
 //	router.GET("/MusicServer/songlist", showSongListHandler)
 //	router.GET("/MusicServer/songlist/:listname", singleSongListHandler)
@@ -79,28 +81,68 @@ func main(){
 }
 func redirectHandler(c *gin.Context){
 	code := c.Query("code")
-	response, err := http.Get("https://slack.com/api/oauth.access?code="+code+
+
+	log.Println("code:" + code)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://slack.com/api/oauth.access?code="+code+
 		"&client_id="+env.CLIENT_ID+
 		"&client_secret="+env.CLIENT_SECRET+
-		"&redirect_uri="+env.REDIRECT_URL)
+		"&redirect_uri="+env.REDIRECT_URL, nil)
+	req.Header.Set("content-type","application/x-www-form-urlencoded")
+	response, _ := client.Do(req)
+       
         if err != nil {
                 panic(err)
         } else {
                 defer response.Body.Close()
-                //_, err := io.Copy(os.Stdout, response.Body)
 		bodyBytes, _ := ioutil.ReadAll(response.Body)
 		JSONresponse, err := gabs.ParseJSON(bodyBytes)
                 if err != nil {
 			log.Println("ERROR response!")
-			log.Println(JSONresponse)
+			log.Println(JSONresponse.StringIndent("", "    "))
                         panic(err)
                 } else {
-			log.Println("Success!")
-			log.Println(JSONresponse)
-			c.String(http.StatusOK, "OK! Thanks for using anime-updater")
+			if(JSONresponse.Path("ok").Data().(bool) == true){
+				log.Println("Success!")
+				log.Println(JSONresponse.StringIndent("", "    "))
+				c.String(http.StatusOK, "OK! Thanks for using anime-updater")
+				team_id := JSONresponse.Path("team_id").Data().(string)
+				access_token := JSONresponse.Path("access_token").Data().(string)
+				//log.Println(team_id + access_token)
+
+				////DB
+				session, err := mgo.DialWithInfo(&mgo.DialInfo{
+					Addrs: Host,
+					// Username: Username,
+					// Password: Password,
+					// Database: Database,
+					// DialServer: func(addr *mgo.ServerAddr) (net.Conn, error) {
+					// 	return tls.Dial("tcp", addr.String(), &tls.Config{})
+					// },
+				})
+				if err != nil {
+					panic(err)
+				}
+				defer session.Close()
+				// Collection
+				collection := session.DB(MGO_Database).C(team_id)
+				collection.RemoveAll(nil)
+				err = collection.Insert(bson.M{"access_token": access_token, "has_token":true})
+				if err != nil {
+					panic(err)
+				}
+				
+				/////DB
+
+			}else {
+				log.Println("ERROR response!")
+				log.Println(JSONresponse.StringIndent("", "    "))
+				c.String(http.StatusOK, "ERROR response, see the log!")
+			}
 		}
 	}
-//	c.JSON(http.StatusOK, list)
+
+
 
 }
 func sendButtonHandler(c *gin.Context){
@@ -117,7 +159,8 @@ func sendButtonHandler(c *gin.Context){
 	response_url := c.PostForm("response_url")
 	team_id := c.PostForm("team_id")
 	user_id := c.PostForm("user_id")
-	
+
+	log.Println(team_id + " : " + user_id)
 	if(token != env.TOKEN){
 		c.String(http.StatusForbidden, "Access forbidden")
 	} else {
@@ -159,17 +202,17 @@ func actionHandler(c *gin.Context){
 	}
 	defer session.Close()
 	// Collection
-	collection := session.DB(MGO_Database).C(team_id + ":" + user_id)
+	collection := session.DB(MGO_Database).C(team_id)
 	if(button_name == "Subscribe" ){
-		err = collection.Insert(bson.M{"title": animeTitle})
-		if err != nil {
-			panic(err)
-		}
+		Who := bson.M{"User_id": user_id}
+		PushToArray := bson.M{"$push": bson.M{"Anime": animeTitle}}
+		collection.Update(Who, PushToArray)
+		
 	} else {
-		err = collection.Remove(bson.M{"title": animeTitle})
-		if err != nil {
-			panic(err)
-		}
+		Who := bson.M{"User_id": user_id}
+		PullFromArray := bson.M{"$pull": bson.M{"Anime": animeTitle}}
+		collection.Update(Who, PullFromArray)
+		
 	}
 	
 	/////DB
@@ -196,6 +239,136 @@ func sendMessageToSlackResponseURL(url string, message []byte){
 	}
 	defer resp.Body.Close()
 }
+func sendUpdateHandler(c *gin.Context){
+	
+
+	animeTitle := c.PostForm("title")
+	attachText := c.PostForm("data")
+
+	log.Println("收到訊息啦！" + animeTitle)
+	log.Println("data: " + attachText)
+	////DB
+	session, err := mgo.DialWithInfo(&mgo.DialInfo{
+		Addrs: Host,
+		// Username: Username,
+		// Password: Password,
+		// Database: Database,
+		// DialServer: func(addr *mgo.ServerAddr) (net.Conn, error) {
+		// 	return tls.Dial("tcp", addr.String(), &tls.Config{})
+		// },
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	//每個Team
+	//每個User
+	//如果有訂閱這animeTitle
+	//送通知
+	// Collection
+	teams, _ := session.DB(MGO_Database).CollectionNames()
+	for _, team := range(teams){
+		if(team == "system.indexes"){
+			continue
+		}
+		//log.Println("teamsNames: " + team)
+		collection := session.DB(MGO_Database).C(team)
+		//拿token
+		type AccessToken struct{
+			ID bson.ObjectId `bson:"_id,omitempty"`
+			Access_token string "access_token"
+			Has_token bool "has_token"
+		}
+		tokenData := AccessToken{}
+		err = collection.Find(bson.M{"has_token": true}).One(&tokenData)
+		if(err != nil){
+			panic(err)
+		}
+		//log.Println(tokenData.Access_token)
+		//Get channelID
+		JSONresponse := gabs.New()
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", "https://slack.com/api/im.list?token=" + tokenData.Access_token, nil)
+		req.Header.Set("content-type","application/x-www-form-urlencoded")
+		response, _ := client.Do(req)
+		if err != nil {
+			panic(err)
+		} else {
+			defer response.Body.Close()
+			bodyBytes, _ := ioutil.ReadAll(response.Body)
+			JSONresponse, err = gabs.ParseJSON(bodyBytes)
+			if err != nil {
+				log.Println("ERROR response!")
+				log.Println(JSONresponse)
+				panic(err)
+			} else {
+				log.Println("Success!")
+				log.Println(JSONresponse.StringIndent("", "   "))
+				c.String(http.StatusOK, "")
+			}
+		}
+
+		//user名單
+		var users []User_doc
+		err = collection.Find(bson.M{"has_token": false}).All(&users)
+		if err != nil {
+			panic(err)
+		}
+		for _, user := range users{
+			//在imlist中找user的channel id
+			channel_id := ""
+			imsArray, _ := JSONresponse.Path("ims").Children()
+			for _, ims_child := range(imsArray){
+				if(ims_child.Path("user").Data().(string) == user.User_id){
+					channel_id = ims_child.Path("id").Data().(string)
+				}
+			}
+			//確認有沒有訂閱
+			found := false
+			for _, t := range user.Anime{
+				if t == animeTitle{
+					found = true
+					break
+				}
+			}
+			if(found){
+				//送通知
+				log.Println("送通知：" + animeTitle)
+				messageJSON := gabs.New()
+				messageJSON.SetP(channel_id, "channel")
+				messageJSON.SetP(false, "as_user")
+				//messageJSON.SetP(animeTitle, "text")
+				messageJSON.SetP(attachText, "attachments")
+				req, err := http.NewRequest("POST", "https://slack.com/api/chat.postMessage", bytes.NewBuffer([]byte(messageJSON.String())))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "Bearer " + tokenData.Access_token)
+				//client := &http.Client{}
+				resp, err := client.Do(req)
+				if err != nil {
+					panic(err)
+				}
+				defer resp.Body.Close()
+				bodyBytes, _ := ioutil.ReadAll(resp.Body)
+				//log.Println("respBidy: " + string(bodyBytes))
+				sendResp, err := gabs.ParseJSON(bodyBytes)
+				if err != nil {
+					log.Println("ERROR response!")
+					log.Println(sendResp.StringIndent("", "   "))
+					panic(err)
+				} else {
+					log.Println("Success!")
+					log.Println(sendResp.StringIndent("", "   "))
+					c.String(http.StatusOK, "")
+				}
+			}
+			
+		}
+		
+	}
+
+
+
+}
 func checkSuscribeJSON(team_id string, user_id string)( *gabs.Container ){
 	///read list json
 	dat, err := ioutil.ReadFile("../list.json")
@@ -220,12 +393,26 @@ func checkSuscribeJSON(team_id string, user_id string)( *gabs.Container ){
 	}
 	defer session.Close()
 	// Collection
-	collection := session.DB(MGO_Database).C(team_id + ":" + user_id)
-
+	collection := session.DB(MGO_Database).C(team_id)
 	
+	///確認是否有此使用者
+	count, err := collection.Find(bson.M{"User_id": user_id}).Count()
+	if err != nil {
+		panic(err)
+	}
+	if(count == 0){
+		collection.Insert(bson.M{"User_id": user_id, "has_token":false})
+	}
 
-
-
+	//查詢使用者訂閱清單
+	//若在陣列中找到則...
+	user_doc1 := User_doc{}
+	err = collection.Find(bson.M{"User_id": user_id}).One(&user_doc1)
+	if err != nil{
+		panic(err)
+	}
+	
+	
 	
 	///MAKE JSON
 //	log.Printf("id: " + team_id + " " + user_id)
@@ -246,11 +433,15 @@ func checkSuscribeJSON(team_id string, user_id string)( *gabs.Container ){
 		animeJSON.Array("actions")
 		
 		suscribeButton := gabs.New()
-		count, err := collection.Find(bson.M{"title": animeTitle}).Count()
-		if err != nil{
-			panic(err)
+
+		found := false
+		for _, childAni := range user_doc1.Anime {
+			if(animeTitle == childAni){
+				found = true
+				break
+			}
 		}
-		if(count > 0){
+		if(found){
 			animeJSON.SetP("已訂閱", "text")
 			suscribeButton.SetP("Unsubscribe", "name")
 			suscribeButton.SetP("Unsubscribe", "text")
@@ -272,4 +463,10 @@ func checkSuscribeJSON(team_id string, user_id string)( *gabs.Container ){
 	//log.Println(messageJSON.StringIndent("", "    "))
 	return messageJSON
 
+}
+type User_doc struct{
+	ID bson.ObjectId `bson:"_id,omitempty"`
+	User_id string "User_id"
+	Anime []string "Anime"
+	Has_token bool "has_token"
 }
