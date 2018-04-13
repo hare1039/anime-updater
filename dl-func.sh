@@ -34,23 +34,23 @@ slack-send()
 	return;
     fi
     local url=$(python3 -c "from urllib.parse import quote; print(quote(\"${1:8}\"))")
-#    local msg=$(cat <<EOF
-#      {
-#        "attachments": [
-#          {
-#            "color": "#36a64f",
-#            "pretext": "<https://hare1039.nctu.me/sysvol${url}|$title> have updated",
-#            "title": "Downloaded $title:",
-#            "title_link": "https://hare1039.nctu.me/sysvol${url}",
-#            "text": "$filename"
-#          }
-#        ]
-#      }
-#EOF
-#)
-
-#    slack-send-raw $msg;
     local msg=$(cat <<EOF
+      {
+        "attachments": [
+          {
+            "color": "#36a64f",
+            "pretext": "<https://hare1039.nctu.me/sysvol${url}|$title> have updated",
+            "title": "Downloaded $title:",
+            "title_link": "https://hare1039.nctu.me/sysvol${url}",
+            "text": "$filename"
+          }
+        ]
+      }
+EOF
+)
+
+    slack-send-raw $msg;
+    local pinkiemsg=$(cat <<EOF
       [
         {
           "color": "#36a64f",
@@ -62,7 +62,7 @@ slack-send()
       ]
 EOF
 )
-    pinkie-send "$title" "$msg";
+    pinkie-send "$title" "$pinkiemsg";
 }
 
 gdrivedl_from()
