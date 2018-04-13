@@ -428,8 +428,11 @@ func checkSuscribeJSON(team_id string, user_id string)( *gabs.Container ){
 	
 
 	for _, child := range listArray {
-		animeTitle := child.Path("title").Data().(string)
-
+		animeTitle, ok := child.Path("title").Data().(string)
+		if !ok{
+			log.Println("Something wrong with the list")
+			continue
+		}
 		animeJSON :=gabs.New()
 		animeJSON.SetP(animeTitle, "title")
 		animeJSON.SetP(child.Path("title").Data().(string), "callback_id")
