@@ -11,10 +11,6 @@ for row in $(echo "${list}" | jq -r '.[] | @base64'); do
      	echo ${row} | base64 --decode | jq -r ${1}
     }
 
-    #echo $(_jq '.title')
-
-    #echo $(_jq '.file_path');
-    #cd $(_jq '.file_path');
     for url in $(_jq '.url[]'); do
 	cd "$(_jq '.file_path')";
 	if [[ "$url" = *"mega"* ]]; then
