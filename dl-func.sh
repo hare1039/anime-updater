@@ -50,7 +50,8 @@ slack-send()
       }
 EOF
 )
-    slack-send-raw $msg;
+#    slack-send-raw $msg;
+    pinkie-send "$title" "$msg";
 }
 
 gdrivedl_from()
