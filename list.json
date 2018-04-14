@@ -136,7 +136,7 @@
 		]
 	},
         {
-                "titile": "piano-no-mori",
+                "title": "piano-no-mori",
                 "file_path": "/mnt/NAS/video/hare/18spring/piano-no-mori",
                 "url": [
                          "https://drive.google.com/drive/folders/1hf1pVTGzZvhvSLaJtML7YQpiRNZ58yuD?usp=sharing"
@@ -148,5 +148,24 @@
                 "url": [
                          "https://mega.nz/#F!SdYzUTBa!oXaZeEAFf1_uwV9p_M-sbQ"
                 ]
+        },
+        {
+                "title": "Steins-Gate-0",
+                "file_path": "/mnt/NAS/video/hare/18spring/Steins-Gate-0",
+                "url": [
+                         "https://drive.google.com/drive/folders/1NkPmlDvsn097KbkH3CHmgepLTaqFFftQ?usp=sharing"
+                ]
+        },
+        {
+                "title": "hina-matsuri",
+                "file_path": "/mnt/NAS/video/hare/18spring/hina-matsuri",
+                "url": [
+		        "https://drive.google.com/drive/folders/1Yoxykqr7boECqiszoSk9fxnu-dazwMXX?usp=sharing",
+		        "https://drive.google.com/drive/folders/1_2e9R9PahdDvmv31VkQexa8WFmdzzOnv?usp=sharing",
+		        "https://drive.google.com/drive/folders/1iaw7JxbPISriJLNg84ktGvXPjCGy1Eje?usp=sharing",
+		        "https://drive.google.com/drive/folders/1aSesEtF_Z0RwJdewH19jciPTHytpQBqn?usp=sharing",
+		        "https://drive.google.com/drive/folders/1f9k-M62TnKh9S1bAUjGkp2kDyJNqUxi6?usp=sharing"
+                ]
         }
+
 ]
