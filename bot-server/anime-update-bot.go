@@ -108,6 +108,7 @@ func redirectHandler(c *gin.Context){
 				c.String(http.StatusOK, "OK! Thanks for using anime-updater")
 				team_id := JSONresponse.Path("team_id").Data().(string)
 				access_token := JSONresponse.Path("access_token").Data().(string)
+				bot_token := JSONresponse.Path("bot.bot_access_token").Data().(string)
 				//log.Println(team_id + access_token)
 
 				////DB
@@ -127,7 +128,10 @@ func redirectHandler(c *gin.Context){
 				// Collection
 				collection := session.DB(MGO_Database).C(team_id)
 				collection.RemoveAll(nil)
-				err = collection.Insert(bson.M{"access_token": access_token, "has_token":true})
+				err = collection.Insert(bson.M{
+					"access_token": access_token,
+					"has_token":true,
+					"bot_token": bot_token})
 				if err != nil {
 					panic(err)
 				}
@@ -278,6 +282,7 @@ func sendUpdateHandler(c *gin.Context){
 			ID bson.ObjectId `bson:"_id,omitempty"`
 			Access_token string "access_token"
 			Has_token bool "has_token"
+			Bot_token string "bot_token"
 		}
 		tokenData := AccessToken{}
 		err = collection.Find(bson.M{"has_token": true}).One(&tokenData)
@@ -288,7 +293,7 @@ func sendUpdateHandler(c *gin.Context){
 		//Get channelID
 		JSONresponse := gabs.New()
 		client := &http.Client{}
-		req, err := http.NewRequest("GET", "https://slack.com/api/im.list?token=" + tokenData.Access_token, nil)
+		req, err := http.NewRequest("GET", "https://slack.com/api/im.list?token=" + tokenData.Bot_token, nil)
 		req.Header.Set("content-type","application/x-www-form-urlencoded")
 		response, _ := client.Do(req)
 		if err != nil {
@@ -423,8 +428,11 @@ func checkSuscribeJSON(team_id string, user_id string)( *gabs.Container ){
 	
 
 	for _, child := range listArray {
-		animeTitle := child.Path("title").Data().(string)
-
+		animeTitle, ok := child.Path("title").Data().(string)
+		if !ok{
+			log.Println("Something wrong with the list")
+			continue
+		}
 		animeJSON :=gabs.New()
 		animeJSON.SetP(animeTitle, "title")
 		animeJSON.SetP(child.Path("title").Data().(string), "callback_id")
