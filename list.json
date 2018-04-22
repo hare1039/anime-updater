@@ -16,13 +16,6 @@
 		]
 	},
 	{
-		"title":"粗點心戰爭2",
-		"file_path":"/mnt/NAS/video/#連載中/粗點心戰爭2",
-		"url":[
-			"https://mega.nz/#F!KZ4l2BiK!hbT4s-Y4e_lCUn-VSag9wg"
-		]
-	},
-	{
 		"title":"DARLING in the FRANXX",
 		"file_path":"/mnt/NAS/video/#連載中/DARLING in the FRANXX",
 		"url":[
@@ -166,6 +159,34 @@
 		        "https://drive.google.com/drive/folders/1aSesEtF_Z0RwJdewH19jciPTHytpQBqn?usp=sharing",
 		        "https://drive.google.com/drive/folders/1f9k-M62TnKh9S1bAUjGkp2kDyJNqUxi6?usp=sharing"
                 ]
+        },
+        {
+                "title": "Pretty-Derby",
+                "file_path": "/mnt/NAS/video/hare/18spring/Pretty-Derby",
+                "url": [
+		        "https://drive.google.com/drive/folders/1g5NAmfSA9Gmp63n7OLtKZ7EizNbY84cD?usp=sharing"
+	        ]
+        },
+        {
+                "title": "wotakoi",
+                "file_path": "/mnt/NAS/video/hare/18spring/wotakoi",
+                "url": [
+		        "https://drive.google.com/drive/folders/1lSxhZkJ6dJzb71Cj8KIhHMgJ8MPr6ym1?usp=sharing"
+	        ]
+        },
+        {
+                "title": "caligula",
+                "file_path": "/mnt/NAS/video/hare/18spring/caligula",
+                "url": [
+		        "https://drive.google.com/drive/folders/1rFDWcbWqSIFVOSkRUD1clIGcVZDUWF6n?usp=sharing",
+		        "https://drive.google.com/drive/folders/1r4wUK8H4X7mmEEgVGMFrIl0N7KiSbCar?usp=sharing"
+	        ]
+        },
+        {
+                "title": "caligula",
+                "file_path": "/mnt/NAS/video/#連載中/Caligula",
+                "url": [
+		    "https://mega.nz/#F!DMBz1DLT!SiIyTcisWY3mBoImQ0J1tg"
+	        ]
         }
-
 ]
