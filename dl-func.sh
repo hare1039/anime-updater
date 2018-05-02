@@ -74,7 +74,7 @@ gdrivedl_from()
     echo "downloading: $title";
     local result=$(python3 ~/Documents/git_projects/gdrivedl/dl.py \
 			   -d $PWD                                 \
-			   -s http://192.168.1.120:4445/wd/hub     \
+			   -s http://192.168.1.120:4446/wd/hub     \
 			   $*)
     if grep -q -v -E 'ERROR|WARNING' <<< "$result"; then
 	local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$result");
