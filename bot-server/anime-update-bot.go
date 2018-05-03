@@ -1,22 +1,17 @@
 package main
 
 import (
-	//"html/template"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"os"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	//"github.com/gorilla/websocket"
-	// "encoding/json"
-	//"strconv"
-	//	"os"
-	//	"path/filepath"
 	"bytes"
 	"github.com/Jeffail/gabs"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	//"strings"
 )
 
 /////const for MONGODB.
@@ -32,7 +27,7 @@ const (
 	MGO_Collection = "YOUR_COLLECTION"
 )
 
-/////
+/////SLACK BOT ENVIRONMENT
 type environment struct {
 	CLIENT_ID     string
 	CLIENT_SECRET string
@@ -42,7 +37,40 @@ type environment struct {
 
 var env = environment{}
 
+/////LOG SETTING
+var (
+    Trace   *log.Logger
+    Info    *log.Logger
+    Warning *log.Logger
+    Error   *log.Logger
+)
+
+func Init(
+    traceHandle io.Writer,
+    infoHandle io.Writer,
+    warningHandle io.Writer,
+    errorHandle io.Writer) {
+
+    Trace = log.New(traceHandle,
+        "TRACE: ",
+        log.Ldate|log.Ltime|log.Lshortfile)
+
+    Info = log.New(infoHandle,
+        "INFO: ",
+        log.Ldate|log.Ltime|log.Lshortfile)
+
+    Warning = log.New(warningHandle,
+        "WARNING: ",
+        log.Ldate|log.Ltime|log.Lshortfile)
+
+    Error = log.New(errorHandle,
+        "ERROR: ",
+        log.Ldate|log.Ltime|log.Lshortfile)
+}
+//////
 func main() {
+	Init(ioutil.Discard, os.Stdout, os.Stdout, os.Stderr)
+
 	dat, err := ioutil.ReadFile("./info.json")
 	if err != nil {
 		panic(err)
@@ -56,11 +84,9 @@ func main() {
 	env.TOKEN = value
 	value, _ = jsonParsed.Path("redirect-url").Data().(string)
 	env.REDIRECT_URL = value
-	log.Println(env)
+	Trace.Println(env)
 
 	router := gin.Default()
-	//router.GET("/ws/MusicPlayer", func(c *gin.Context){wshandler(c.Writer, c.Request)})
-	//router.Use(cors.Default())
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowMethods = []string{"GET", "POST", "DELETE"}
@@ -71,21 +97,14 @@ func main() {
 	router.POST("/AnimeUpdate/slash-command/anime-updater", sendButtonHandler)
 	router.POST("/AnimeUpdate/action", actionHandler)
 	router.POST("/AnimeUpdate/eat-my-update", sendUpdateHandler)
-	/////MONGOBD
-	//	router.GET("/MusicServer/songlist", showSongListHandler)
-	//	router.GET("/MusicServer/songlist/:listname", singleSongListHandler)
-	//	router.POST("/MusicServer/songlist", addToSongListHandler)
-	//	router.POST("/MusicServer/songquery", songQueryHandler)
-	//	router.DELETE("/MusicServer/songlist", deleteSongHandler)
-	/////
 
 	router.Run(":8027")
-	log.Println("Serveing on 8027")
+	Info.Println("Serveing on 8027")
 }
 func redirectHandler(c *gin.Context) {
 	code := c.Query("code")
 
-	log.Println("code:" + code)
+	Trace.Println("code:" + code)
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://slack.com/api/oauth.access?code="+code+
 		"&client_id="+env.CLIENT_ID+
@@ -101,18 +120,18 @@ func redirectHandler(c *gin.Context) {
 		bodyBytes, _ := ioutil.ReadAll(response.Body)
 		JSONresponse, err := gabs.ParseJSON(bodyBytes)
 		if err != nil {
-			log.Println("ERROR response!")
-			log.Println(JSONresponse.StringIndent("", "    "))
+			Error.Println("ERROR Auth response!")
+			Trace.Println(JSONresponse.StringIndent("", "    "))
 			panic(err)
 		} else {
 			if JSONresponse.Path("ok").Data().(bool) == true {
-				log.Println("Success!")
-				log.Println(JSONresponse.StringIndent("", "    "))
+				Info.Println("Auth Success!")
+				Trace.Println(JSONresponse.StringIndent("", "    "))
 				c.String(http.StatusOK, "OK! Thanks for using anime-updater")
 				team_id := JSONresponse.Path("team_id").Data().(string)
 				access_token := JSONresponse.Path("access_token").Data().(string)
 				bot_token := JSONresponse.Path("bot.bot_access_token").Data().(string)
-				//log.Println(team_id + access_token)
+				Trace.Println(team_id + access_token)
 
 				////DB
 				session, err := mgo.DialWithInfo(&mgo.DialInfo{
@@ -142,9 +161,9 @@ func redirectHandler(c *gin.Context) {
 				/////DB
 
 			} else {
-				log.Println("ERROR response!")
+				log.Println("ERROR Auth response!")
 				log.Println(JSONresponse.StringIndent("", "    "))
-				c.String(http.StatusOK, "ERROR response, see the log!")
+				c.String(http.StatusOK, "ERROR Auth response, see the log!")
 			}
 		}
 	}
@@ -153,18 +172,12 @@ func redirectHandler(c *gin.Context) {
 func sendButtonHandler(c *gin.Context) {
 	c.String(http.StatusOK, "")
 
-	//	x, err := ioutil.ReadAll(c.Request.Body)
-	//	if(err != nil){
-	//		panic(err)
-	//	}
-	//        log.Println("Postbody:" + string(x))
-
 	token := c.PostForm("token")
 	response_url := c.PostForm("response_url")
 	team_id := c.PostForm("team_id")
 	user_id := c.PostForm("user_id")
 
-	log.Println(team_id + " : " + user_id)
+	Trace.Println(team_id + " : " + user_id)
 	if token != env.TOKEN {
 		c.String(http.StatusForbidden, "Access forbidden")
 	} else {
@@ -178,7 +191,7 @@ func actionHandler(c *gin.Context) {
 	c.String(http.StatusOK, "")
 	payload := c.PostForm("payload")
 	payloadJSON, _ := gabs.ParseJSON([]byte(payload))
-	log.Println(payloadJSON.StringIndent("", "    "))
+	Trace.Println(payloadJSON.StringIndent("", "    "))
 	response_url, _ := payloadJSON.Path("response_url").Data().(string)
 	//user_name, _ := payloadJSON.Path("user.name").Data().(string)
 
@@ -219,17 +232,12 @@ func actionHandler(c *gin.Context) {
 
 	/////DB
 
-	//	messageJSON := gabs.New()
-	//	messageJSON.SetP(user_name + " clicked: " + action_array_name, "text")
-	//	messageJSON.SetP(false, "replace_original")
-	//	log.Println(messageJSON.String())
-
 	messageJSON := checkSuscribeJSON(team_id, user_id)
 
 	sendMessageToSlackResponseURL(response_url, []byte(messageJSON.String()))
 }
 func sendMessageToSlackResponseURL(url string, message []byte) {
-	log.Println("POST to " + url)
+	Info.Println("POST to " + url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(message))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -245,8 +253,8 @@ func sendUpdateHandler(c *gin.Context) {
 	animeTitle := c.PostForm("title")
 	attachText := c.PostForm("data")
 
-	log.Println("收到訊息啦！" + animeTitle)
-	//	log.Println("data: " + attachText)
+	Info.Println("收到訊息啦！" + animeTitle)
+	Trace.Println("data: " + attachText)
 	////DB
 	session, err := mgo.DialWithInfo(&mgo.DialInfo{
 		Addrs: Host,
@@ -271,7 +279,7 @@ func sendUpdateHandler(c *gin.Context) {
 		if team == "system.indexes" {
 			continue
 		}
-		//log.Println("teamsNames: " + team)
+		Trace.Println("teamsNames: " + team)
 		collection := session.DB(MGO_Database).C(team)
 		//拿token
 		type AccessToken struct {
@@ -285,7 +293,7 @@ func sendUpdateHandler(c *gin.Context) {
 		if err != nil {
 			panic(err)
 		}
-		//log.Println(tokenData.Access_token)
+		Trace.Println(tokenData.Access_token)
 		//Get channelID
 		JSONresponse := gabs.New()
 		client := &http.Client{}
@@ -299,16 +307,16 @@ func sendUpdateHandler(c *gin.Context) {
 			bodyBytes, _ := ioutil.ReadAll(response.Body)
 			JSONresponse, err = gabs.ParseJSON(bodyBytes)
 			if err != nil {
-				log.Println("IMS ERROR response!")
-				//log.Println(JSONresponse)
+				Error.Println("IMS ERROR response!")
+				Trace.Println(JSONresponse)
 				panic(err)
 			} else if JSONresponse.Path("ok").Data().(bool) == false {
-				log.Println("IMS not OK!")
-				log.Println(JSONresponse.StringIndent("", "   "))
+				Error.Println("IMS not OK!")
+				Trace.Println(JSONresponse.StringIndent("", "   "))
 				c.String(http.StatusOK, "")
 			} else {
-				log.Println("IMS Success!")
-				//log.Println(JSONresponse.StringIndent("", "   "))
+				Info.Println("IMS Success!")
+				Trace.Println(JSONresponse.StringIndent("", "   "))
 				c.String(http.StatusOK, "")
 			}
 		}
@@ -319,7 +327,7 @@ func sendUpdateHandler(c *gin.Context) {
 		if err != nil {
 			panic(err)
 		} else {
-			log.Println(users)
+			Trace.Println(users)
 		}
 		for _, user := range users {
 			//在imlist中找user的channel id
@@ -328,7 +336,7 @@ func sendUpdateHandler(c *gin.Context) {
 			for _, ims_child := range imsArray {
 				if ims_child.Path("user").Data().(string) == user.User_id {
 					channel_id = ims_child.Path("id").Data().(string)
-					log.Println("ChannelID: " + channel_id)
+					Trace.Println("ChannelID: " + channel_id)
 				}
 			}
 			//確認有沒有訂閱
@@ -341,7 +349,7 @@ func sendUpdateHandler(c *gin.Context) {
 			}
 			if found {
 				//送通知
-				log.Println("送通知：" + animeTitle)
+				Info.Println("送通知：" + animeTitle)
 				messageJSON := gabs.New()
 				messageJSON.SetP(channel_id, "channel")
 				messageJSON.SetP(false, "as_user")
@@ -360,12 +368,12 @@ func sendUpdateHandler(c *gin.Context) {
 				//log.Println("respBidy: " + string(bodyBytes))
 				sendResp, err := gabs.ParseJSON(bodyBytes)
 				if err != nil {
-					log.Println("sendMsg ERROR response!")
-					log.Println(sendResp.StringIndent("", "   "))
+					Error.Println("sendMsg ERROR response!")
+					Trace.Println(sendResp.StringIndent("", "   "))
 					panic(err)
 				} else {
-					log.Println("sendMsg Success!")
-					log.Println(sendResp.StringIndent("", "   "))
+					Info.Println("sendMsg Success!")
+					Trace.Println(sendResp.StringIndent("", "   "))
 					c.String(http.StatusOK, "")
 				}
 			}
@@ -425,7 +433,7 @@ func checkSuscribeJSON(team_id string, user_id string) *gabs.Container {
 	for _, child := range listArray {
 		animeTitle, ok := child.Path("title").Data().(string)
 		if !ok {
-			log.Println("Something wrong with the list")
+			Error.Println("Something wrong with the list")
 			continue
 		}
 		animeJSON := gabs.New()
@@ -463,7 +471,8 @@ func checkSuscribeJSON(team_id string, user_id string) *gabs.Container {
 
 		messageJSON.ArrayAppendP(animeJSON.Data(), "attachments")
 	}
-	//log.Println(messageJSON.StringIndent("", "    "))
+	Trace.Println("messageJSON : ")
+	Trace.Println(messageJSON.StringIndent("", "    "))
 	return messageJSON
 
 }
