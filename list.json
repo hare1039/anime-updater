@@ -151,6 +151,13 @@
                 ]
         },
         {
+                "title": "Steins-Gate-0",
+                "file_path": "/mnt/NAS/video/#連載中/命運石之門0",
+                "url": [
+		    "https://mega.nz/#F!vERk2CQK!wAxtnHibuD3jwsydlXhx6g"
+	        ]
+        },
+        {
                 "title": "hina-matsuri",
                 "file_path": "/mnt/NAS/video/hare/18spring/hina-matsuri",
                 "url": [
@@ -217,14 +224,6 @@
                 "file_path": "/mnt/NAS/video/#連載中/ひそねとまそたん",
                 "url": [
 		    "https://mega.nz/#F!PNYzECSZ!Ufv3IMXNmTCutegt_0BNjQ"
-	        ]
-        },
-        {
-                "title": "3D-kanojo",
-                "file_path": "/mnt/NAS/video/hare/18spring/3dkanojo",
-                "url": [
-		    "https://drive.google.com/drive/folders/11Dlyo_rFR1JwjBPiOobJqWrTxIC1surY?usp=sharing",
-		    "https://drive.google.com/drive/folders/1yi5471N8wrSdZKtr_ttRwTUBdokmwrEo?usp=sharing"
 	        ]
         }
 ]
