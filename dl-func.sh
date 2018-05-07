@@ -1,5 +1,5 @@
-trace_file=$SCRIPTPATH/rate.txt;
-line_buf_file=${HOME}/Documents/git_projects/line-buff/message.txt;
+source $SCRIPTPATH/config.sh;
+
 instance_sub()
 {
     local rate=$(cat ${trace_file});
@@ -19,11 +19,8 @@ instance_plus()
     echo $rate > ${trace_file};
 }
 
-source ${HOME}/.bash_profile
-export LC_ALL=zh_TW.UTF-8
 instance_sub;
 trap instance_plus EXIT;
-ERROR_CODE=254;
 cd ${HOME};
 
 slack-send()
@@ -33,15 +30,15 @@ slack-send()
     if [ "$filename" = "\n" ] || [ "$filename" = "" ]; then
 	return;
     fi
-    local url=$(python3 -c "from urllib.parse import quote; print(quote(\"${1:8}\"))")
+    local url=$(${PYTHON3} -c "from urllib.parse import quote; print(quote(\"${1:8}\"))")
     local msg=$(cat <<EOF
       {
         "attachments": [
           {
             "color": "#36a64f",
-            "pretext": "<https://hare1039.nctu.me/sysvol${url}|$title> have updated",
+            "pretext": "<${BASE_URL}${url}|$title> have updated",
             "title": "Downloaded $title:",
-            "title_link": "https://hare1039.nctu.me/sysvol${url}",
+            "title_link": "${BASE_URL}${url}",
             "text": "$filename"
           }
         ]
@@ -54,9 +51,9 @@ EOF
       [
         {
           "color": "#36a64f",
-          "pretext": "<https://hare1039.nctu.me/sysvol${url}|$title> have updated",
+          "pretext": "<${BASE_URL}${url}|$title> have updated",
           "title": "Downloaded $title:",
-          "title_link": "https://hare1039.nctu.me/sysvol${url}",
+          "title_link": "${BASE_URL}${url}",
           "text": "$filename"
         }
       ]
@@ -72,10 +69,10 @@ gdrivedl_from()
 	return $err;
     fi
     echo "downloading: $title";
-    local result=$(python3 ~/Documents/git_projects/gdrivedl/dl.py \
-			   -d $PWD                                 \
-			   -s http://192.168.1.120:4446/wd/hub     \
-			   $*)
+    local result=$(${PYTHON3} ${GDRIVEDL_PY}                  \
+			      -d $PWD                         \
+			      -s ${GDRIVEDL_PY_SELENIUM_HOST} \
+			      $*)
     if grep -q -v -E 'ERROR|WARNING' <<< "$result"; then
 	local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$result");
 	local filename;

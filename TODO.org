@@ -1,14 +1,14 @@
 * TODO server.go
-** TODO Remove comments
+** DONE Remove comments
 ** TODO ./info.json setup guide
-* TODO line_buf_file remove / keep ?
-* TODO dependency
+* DONE line_buf_file remove / keep ?
+* DONE dependency
 ** jq megadl
-* TODO A config file for controlling the updater
-** TODO gdrivedl location
+* DONE A config file for controlling the updater
+** DONE gdrivedl location
 *** gdrivedl dep 
-** TODO .bash_profile
-*** TODO slack-send-raw()
+** DONE .bash_profile
+*** DONE slack-send-raw()
 {
     curl -X POST                             \
          -H 'Content-type: application/json' \
@@ -16,7 +16,7 @@
 	 https://hooks.slack.com/services/X/X/XX;
 }
 
-*** TODO pinkie-send()
+*** DONE pinkie-send()
 {
     curl -X POST          \
 	 -F "title=$1"    \
@@ -24,8 +24,8 @@
 	 https://hare1039.nctu.me/AnimeUpdate/eat-my-update;
 }
 
-** TODO web host url
-** TODO selenium host url
-** TODO list.json remove / keep ?
+** DONE web host url
+** DONE selenium host url
+** DONE list.json remove / keep ?
 * TODO Setup guidence 
 ** rate.txt
