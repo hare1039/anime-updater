@@ -1,24 +1,21 @@
 package main
 
 import (
+	"bytes"
+	"github.com/Jeffail/gabs"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"os"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"bytes"
-	"github.com/Jeffail/gabs"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"os"
 )
 
 /////const for MONGODB.
-var Host = []string{
-	"192.168.1.120:27017",
-	// replica set addrs...
-}
+var Host = []string{}
 
 const (
 	Username       = "YOUR_USERNAME"
@@ -39,34 +36,35 @@ var env = environment{}
 
 /////LOG SETTING
 var (
-    Trace   *log.Logger
-    Info    *log.Logger
-    Warning *log.Logger
-    Error   *log.Logger
+	Trace   *log.Logger
+	Info    *log.Logger
+	Warning *log.Logger
+	Error   *log.Logger
 )
 
 func Init(
-    traceHandle io.Writer,
-    infoHandle io.Writer,
-    warningHandle io.Writer,
-    errorHandle io.Writer) {
+	traceHandle io.Writer,
+	infoHandle io.Writer,
+	warningHandle io.Writer,
+	errorHandle io.Writer) {
 
-    Trace = log.New(traceHandle,
-        "TRACE: ",
-        log.Ldate|log.Ltime|log.Lshortfile)
+	Trace = log.New(traceHandle,
+		"TRACE: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
 
-    Info = log.New(infoHandle,
-        "INFO: ",
-        log.Ldate|log.Ltime|log.Lshortfile)
+	Info = log.New(infoHandle,
+		"INFO: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
 
-    Warning = log.New(warningHandle,
-        "WARNING: ",
-        log.Ldate|log.Ltime|log.Lshortfile)
+	Warning = log.New(warningHandle,
+		"WARNING: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
 
-    Error = log.New(errorHandle,
-        "ERROR: ",
-        log.Ldate|log.Ltime|log.Lshortfile)
+	Error = log.New(errorHandle,
+		"ERROR: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
 }
+
 //////
 func main() {
 	Init(ioutil.Discard, os.Stdout, os.Stdout, os.Stderr)
@@ -84,6 +82,8 @@ func main() {
 	env.TOKEN = value
 	value, _ = jsonParsed.Path("redirect-url").Data().(string)
 	env.REDIRECT_URL = value
+	value, _ = jsonParsed.Path("mongodb-host").Data().(string)
+	Host = append(Host, value)
 	Trace.Println(env)
 
 	router := gin.Default()
