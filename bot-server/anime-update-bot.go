@@ -426,7 +426,7 @@ func checkSuscribeJSON(team_id string, user_id string) *gabs.Container {
 	///MAKE JSON
 	//	log.Printf("id: " + team_id + " " + user_id)
 	messageJSON := gabs.New()
-	messageJSON.SetP("以下是承皓肥宅最近在追的番，訂閱以獲得更新通知。", "text")
+	messageJSON.SetP("以下列表，訂閱以獲得更新通知。", "text")
 	messageJSON.SetP(true, "replace_original")
 	messageJSON.Array("attachments")
 
