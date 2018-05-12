@@ -1,28 +1,5 @@
 source $SCRIPTPATH/config.sh;
 
-instance_sub()
-{
-    local rate=$(cat ${trace_file});
-    if [ $rate -eq "0" ]; then
-	echo "Too meny mega instences. Skip.";
-	exit 0;
-    fi
-    # ok, instence - 1
-    let "rate = $rate - 1";
-    echo $rate > ${trace_file};
-}
-instance_plus()
-{
-    local rate=$(cat ${trace_file});
-    # instence + 1
-    let "rate = $rate + 1";
-    echo $rate > ${trace_file};
-}
-
-instance_sub;
-trap instance_plus EXIT;
-cd ${HOME};
-
 slack-send()
 {
     local title="${1##*/}";
@@ -62,7 +39,7 @@ EOF
     pinkie-send "$title" "$pinkiemsg";
 }
 
-gdrivedl_from()
+gdrivedl-from()
 {
     local title=${PWD##*/};
     if [[ "${PWD}" == "${HOME}" ]]; then
@@ -88,7 +65,7 @@ gdrivedl_from()
     return $err;
 }
 
-megadl_from()
+megadl-from()
 {
     local title=${PWD##*/};
     local err=$ERROR_CODE;

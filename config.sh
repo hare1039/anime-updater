@@ -28,11 +28,12 @@ export trace_file=$SCRIPTPATH/rate.txt;
 export line_buf_file=${HOME}/Documents/git_projects/line-buff/message.txt; # this file is for error handling
 export LC_ALL=zh_TW.UTF-8;
 export ERROR_CODE=254;
+export TIMEOUT="timeout 12h";
 
 # message part
 export BASE_URL='https://hare1039.nctu.me/sysvol';
 
-# dgrivedl setup
+# gdrivedl setup
 export GDRIVEDL_PY="${HOME}/Documents/git_projects/gdrivedl/dl.py";
 export PYTHON3='python3';
 export GDRIVEDL_PY_SELENIUM_HOST='http://192.168.1.120:4446/wd/hub';
