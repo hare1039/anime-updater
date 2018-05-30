@@ -46,10 +46,18 @@ gdrivedl-from()
 	return $err;
     fi
     echo "downloading: $title";
-    local result=$(${PYTHON3} ${GDRIVEDL_PY}                  \
-			      -d $PWD                         \
-			      -s ${GDRIVEDL_PY_SELENIUM_HOST} \
+    local result=$(${PYTHON3} ${GDRIVEDL_PY}                          \
+			      -d $PWD                                 \
+			      -s ${GDRIVEDL_PY_SELENIUM_HOST}         \
+			      -t 'test "$(ls | grep "(1).mp4\|(1).mkv")" = ""' \
 			      $*)
+    if [ "$?" != "0" ]; then
+	echo 'gdrivedl return non zero code, try cleaning up'
+	find . -name '*(*).mp4' -delete
+	find . -name '*(*).mkv'	-delete
+	find . -name '*.part' -delete
+	find . -size 0 -not -name '*.txt' -delete
+    fi
     if grep -q -v -E 'ERROR|WARNING' <<< "$result"; then
 	local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$result");
 	local filename;
