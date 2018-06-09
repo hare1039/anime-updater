@@ -28,19 +28,19 @@ trap instance_plus EXIT;
 
 SRC_DL_FUNC="source $SCRIPTPATH/dl-func.sh";
 list=$(cat $SCRIPTPATH/list.json);
-cd ${HOME};
 
 for row in $(echo "${list}" | jq -r '.[] | @base64'); do
     _jq() {
      	echo ${row} | base64 --decode | jq -r ${1}
     }
-
+	cd ${HOME};
     for url in $(_jq '.url[]'); do
-	cd "$(_jq '.file_path')";
-	if [[ "$url" = *"mega"* ]]; then
-	    $TIMEOUT bash -c "$SRC_DL_FUNC; megadl-from $url";
-	elif [[ "$url" = *"google.com"* ]]; then
-	    $TIMEOUT bash -c "$SRC_DL_FUNC; gdrivedl-from $url";
+		cd "$(_jq '.file_path')";
+		if [[ "$url" = *"mega"* ]]; then
+			$TIMEOUT bash -c "$SRC_DL_FUNC; megadl-from $url";
+		elif [[ "$url" = *"google.com"* ]]; then
+			$TIMEOUT bash -c "$SRC_DL_FUNC; gdrivedl-from $url";
         fi
+		cd ${HOME};
     done
 done

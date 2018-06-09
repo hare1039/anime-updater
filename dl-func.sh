@@ -5,7 +5,7 @@ slack-send()
     local title="${1##*/}";
     local filename="${@:2}";
     if [ "$filename" = "\n" ] || [ "$filename" = "" ]; then
-	return;
+		return;
     fi
     local url=$(${PYTHON3} -c "from urllib.parse import quote; print(quote(\"${1:8}\"))")
     local msg=$(cat <<EOF
@@ -39,25 +39,26 @@ EOF
     pinkie-send "$title" "$pinkiemsg";
 }
 
+gdrivedl-cleanup()
+{
+    find . -name '*(*).mp4' -delete
+    find . -name '*(*).mkv' -delete
+    find . -name '*.part' -delete
+    find . -size 0 -not -name '*.txt' -delete
+}
+
 gdrivedl-from()
 {
     local title=${PWD##*/};
     if [[ "${PWD}" == "${HOME}" ]]; then
-	return $err;
+		return $err;
     fi
     echo "downloading: $title";
     local result=$(${PYTHON3} ${GDRIVEDL_PY}                          \
 			      -d $PWD                                 \
 			      -s ${GDRIVEDL_PY_SELENIUM_HOST}         \
 			      -t 'test "$(ls | grep "(1).mp4\|(1).mkv")" = ""' \
-			      $*)
-    if [ "$?" != "0" ]; then
-	echo 'gdrivedl return non zero code, try cleaning up'
-	find . -name '*(*).mp4' -delete
-	find . -name '*(*).mkv'	-delete
-	find . -name '*.part' -delete
-	find . -size 0 -not -name '*.txt' -delete
-    fi
+			      $* || gdrivedl-cleanup 2>/dev/null);
     if grep -q -v -E 'ERROR|WARNING' <<< "$result"; then
 	local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$result");
 	local filename;
