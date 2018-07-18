@@ -4,9 +4,15 @@ slack-send()
 {
     local title="${1##*/}";
     local filename="${@:2}";
-	if [ "$filename" = "" ]; then
-		return;
+
+	if [ "$filename" = "" ] ; then
+        return;
     fi
+	for msg in ${IGNORE_MSG[*]}; do
+        if [ "$filename" = "$msg" ] ; then
+			return;
+		fi
+    done
 	for pattern in ${IGNORE_MSG_PATTERN[*]}; do
 		if ${PYTHON3} -c "import re; R = re.search('$pattern', '$filename'); E = 1 if R is None else 0; exit(E);"; then
 			# match => break;

@@ -32,7 +32,8 @@ export TIMEOUT="timeout --signal SIGINT 6h";
 
 # message part
 export BASE_URL='https://hare1039.nctu.me/sysvol';
-export IGNORE_MSG_PATTERN=('\n' '.*伊莉.*txt.*'); # prevent any message that match these pattern to be post to slack
+export IGNORE_MSG=('\n');
+export IGNORE_MSG_PATTERN=('.*伊莉.*txt.*'); # prevent any message that match these pattern to be post to slack
 
 # gdrivedl setup
 export GDRIVEDL_PY="${HOME}/Documents/git_projects/gdrivedl/dl.py";
