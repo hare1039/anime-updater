@@ -28,12 +28,13 @@ export trace_file=$SCRIPTPATH/rate.txt;
 export line_buf_file=${HOME}/Documents/git_projects/line-buff/message.txt; # this file is for error handling
 export LC_ALL=zh_TW.UTF-8;
 export ERROR_CODE=254;
-export TIMEOUT="timeout 6h";
+export TIMEOUT="timeout --signal SIGINT 6h";
 
 # message part
 export BASE_URL='https://hare1039.nctu.me/sysvol';
+export IGNORE_MSG_PATTERN=('\n' '.*伊莉.*txt.*'); # prevent any message that match these pattern to be post to slack
 
 # gdrivedl setup
 export GDRIVEDL_PY="${HOME}/Documents/git_projects/gdrivedl/dl.py";
 export PYTHON3='python3';
-export GDRIVEDL_PY_SELENIUM_HOST='http://192.168.1.120:4448/wd/hub';
+export GDRIVEDL_PY_SELENIUM_HOST='http://192.168.1.120:4444/wd/hub';
