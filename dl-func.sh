@@ -60,21 +60,21 @@ gdrivedl-from()
 		return $err;
     fi
     echo "downloading: $title";
-    local result=$(${PYTHON3} ${GDRIVEDL_PY}                          \
-			      -d $PWD                                 \
-			      -s ${GDRIVEDL_PY_SELENIUM_HOST}         \
+    local result=$(${PYTHON3} ${GDRIVEDL_PY}                       \
+			      -d $PWD                                          \
+			      -s ${GDRIVEDL_PY_SELENIUM_HOST}                  \
 			      -t 'test "$(ls | grep "(1).mp4\|(1).mkv")" = ""' \
 			      $* || gdrivedl-cleanup 2>/dev/null);
     if grep -q -v -E 'ERROR|WARNING' <<< "$result"; then
-	local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$result");
-	local filename;
-	while read -r line; do
-	    filename="$filename \n${line##*/}";
-	done <<< "$rawname";
-	echo $filename;
-	slack-send $PWD $filename;
-	echo "$title have updated";
-	err=0;
+		local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$result");
+		local filename;
+		while read -r line; do
+			filename="$filename \n${line##*/}";
+		done <<< "$rawname";
+		echo $filename;
+		slack-send $PWD $filename;
+		echo "$title have updated";
+		err=0;
     fi
     cd ${HOME};
     return $err;
@@ -85,25 +85,25 @@ megadl-from()
     local title=${PWD##*/};
     local err=$ERROR_CODE;
     if [[ "${PWD}" == "${HOME}" ]]; then
-	return $err;
+		return $err;
     fi
     echo "downloading: $title";
     local mega_result=$(megadl --no-progress --print-names $* 2>&1);
     if grep -q 'ENOENT' <<< "$mega_result" ; then
-#	line "$title dl failed. Please renew the url. <<$*>>"
-	echo "$title dl failed. Please renew the url. <<$*>>" > $line_buf_file;
-	echo "$title download failed. Please renew the url. <<$*>>";
+		#	line "$title dl failed. Please renew the url. <<$*>>"
+		echo "$title dl failed. Please renew the url. <<$*>>" > $line_buf_file;
+		echo "$title download failed. Please renew the url. <<$*>>";
     fi
     if grep -q -v -E 'ERROR|WARNING' <<< "$mega_result"; then
-	local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$mega_result");
-	local filename;
-	while read -r line; do
-	    filename="$filename \n${line##*/}";
-	done <<< "$rawname";
-#	line "$title have updated.,$filename have been downloaded.";
-	slack-send "$PWD" "$filename"
-	echo "$title have updated";
-	err=0;
+		local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$mega_result");
+		local filename;
+		while read -r line; do
+			filename="$filename \n${line##*/}";
+		done <<< "$rawname";
+		#	line "$title have updated.,$filename have been downloaded.";
+		slack-send "$PWD" "$filename"
+		echo "$title have updated";
+		err=0;
     fi
 
     if grep -q "509" <<< "$mega_result"; then
