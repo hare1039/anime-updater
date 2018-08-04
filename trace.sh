@@ -8,8 +8,8 @@ instance_sub()
 {
     local rate=$(cat ${trace_file});
     if [ $rate -eq "0" ]; then
-	echo "Too meny mega instences. Skip.";
-	exit 0;
+        echo "Too meny mega instences. Skip.";
+        exit 0;
     fi
     # ok, instence - 1
     let "rate = $rate - 1";
@@ -31,16 +31,16 @@ list=$(cat $SCRIPTPATH/list.json);
 
 for row in $(echo "${list}" | jq -r '.[] | @base64'); do
     _jq() {
-     	echo ${row} | base64 --decode | jq -r ${1}
+        echo ${row} | base64 --decode | jq -r ${1}
     }
-	cd ${HOME};
+    cd ${HOME};
     for url in $(_jq '.url[]'); do
-		cd "$(_jq '.file_path')";
-		if [[ "$url" = *"mega"* ]]; then
-			$TIMEOUT bash -c "$SRC_DL_FUNC; megadl-from $url";
-		elif [[ "$url" = *"google.com"* ]]; then
-			$TIMEOUT bash -c "$SRC_DL_FUNC; gdrivedl-from $url";
+        cd "$(_jq '.file_path')";
+        if [[ "$url" = *"mega"* ]]; then
+            $TIMEOUT bash -c "$SRC_DL_FUNC; megadl-from $url";
+        elif [[ "$url" = *"google.com"* ]]; then
+            $TIMEOUT bash -c "$SRC_DL_FUNC; gdrivedl-from $url";
         fi
-		cd ${HOME};
+        cd ${HOME};
     done
 done
