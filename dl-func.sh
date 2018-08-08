@@ -53,8 +53,8 @@ EOF
 
 gdrivedl-cleanup()
 {
-    find . -name '*(*).mp4' -delete
-    find . -name '*(*).mkv' -delete
+    find . -name '*([0-9]).mp4' -delete
+    find . -name '*([0-9]).mkv' -delete
     find . -name '*.part' -delete
     find . -size 0 -not -name '*.txt' -delete
 }
