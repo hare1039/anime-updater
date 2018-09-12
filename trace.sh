@@ -7,7 +7,7 @@ source $SCRIPTPATH/config.sh;
 instance_sub()
 {
     local rate=$(cat ${trace_file});
-    if [ $rate -eq "0" ]; then
+    if (( "$rate" <= 0 )); then
         echo "Too meny mega instences. Skip.";
         exit 0;
     fi
@@ -25,6 +25,12 @@ instance_plus()
 
 instance_sub;
 trap instance_plus EXIT;
+
+INT-handler () {
+    echo "Cleaning up"
+    exit
+}
+trap INT-handler INT
 
 SRC_DL_FUNC="source $SCRIPTPATH/dl-func.sh";
 list=$(cat $SCRIPTPATH/list.json);
