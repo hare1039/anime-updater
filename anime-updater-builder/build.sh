@@ -52,7 +52,7 @@ elif [[ "$INPUT" == "0" ]]; then
     SELENIUM_PORTS_LINE2=""
 else
     SELENIUM_PORTS_LINE1='    ports:'
-    SELENIUM_PORTS_LINE2='      - "$INPUT:5900"'
+    SELENIUM_PORTS_LINE2="      - '$INPUT:5900'"
     echo "VNC Password is 'secret'"
 fi
 
@@ -92,7 +92,7 @@ echo "---"
 echo "Here is your ./docker-compose.yml look like"
 echo "Please change it now if necessary"
 echo ""
-PUBLIC_HOST="http://$(curl ifconfig.me 2>/dev/null):${HTTP_PORT}";
+PUBLIC_HOST="http://$(curl ipinfo.io/ip 2>/dev/null):${HTTP_PORT}";
 read -p "Script paused. [Enter] to continue. " INPUT
 
 

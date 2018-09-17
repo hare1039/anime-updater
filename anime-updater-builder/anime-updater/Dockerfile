@@ -44,4 +44,4 @@ COPY Caddyfile /Caddyfile
 
 EXPOSE 80 443
 
-ENTRYPOINT ["bash", "-c", "caddy -conf /Caddyfile"]
+ENTRYPOINT ["bash", "-c", "crond -P /usr/bin:/bin:/usr/sbin; caddy -conf /Caddyfile"]
