@@ -178,6 +178,7 @@ echo "Finally, generate a slack button at https://api.slack.com/docs/slack-butto
 echo "The adding button is close to middle of the page"
 read -p "Paste your button link here: " HTML_BUTTON
 
+mkdir -p ${ANIME_UPDATER_DIR}/bot-server/web
 tee ${ANIME_UPDATER_DIR}/bot-server/web/add_to_slack.html <<EOF
 <!DOCTYPE html>
 <html>
