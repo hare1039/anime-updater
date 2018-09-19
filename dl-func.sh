@@ -2,7 +2,7 @@ source $SCRIPTPATH/config.sh;
 
 slack-send()
 {
-    local title="${1##*/}";
+    local title="${PWD##*/}";
     local filename="${@:2}";
 
     if [ "$filename" = "" ] ; then
@@ -73,12 +73,12 @@ gdrivedl-from()
                   $* || gdrivedl-cleanup 2>/dev/null);
     if grep -q -v -E 'ERROR|WARNING' <<< "$result"; then
         local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$result");
-        local filename;
+        local filename_cat='';
         while read -r line; do
-            filename="$filename \n${line##*/}";
+            local filename=${line##*/};
+            filename_cat="$filename_cat\n$filename";
         done <<< "$rawname";
-        echo $filename;
-        slack-send $PWD $filename;
+        slack-send "$PWD" "$filename_cat"
         echo "$title have updated";
         err=0;
     fi
@@ -102,12 +102,15 @@ megadl-from()
     fi
     if grep -q -v -E 'ERROR|WARNING' <<< "$mega_result"; then
         local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$mega_result");
-        local filename;
+        local filename_cat='';
+        local folder='';
         while read -r line; do
-            filename="$filename \n${line##*/}";
+            local filename=${line##*/};
+            filename_cat="$filename_cat\n$filename";
+            folder=${line%"$filename"}
         done <<< "$rawname";
         #   line "$title have updated.,$filename have been downloaded.";
-        slack-send "$PWD" "$filename"
+        slack-send "$folder" "$filename_cat"
         echo "$title have updated";
         err=0;
     fi
