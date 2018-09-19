@@ -19,7 +19,7 @@ slack-send()
             return;
         fi;
     done
-    local url=$(${PYTHON3} -c "from urllib.parse import quote; print(quote(\"${1:8}\"))")
+    local url=$(${PYTHON3} -c "from urllib.parse import quote; print(quote(\"${1#$RM_LOCALFS_PREFIX}\"))")
     local msg=$(cat <<EOF
       {
         "attachments": [

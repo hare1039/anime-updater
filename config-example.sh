@@ -6,7 +6,7 @@
 
 source ${HOME}/.bash_profile;
 
-# or you can write the function here. 
+# or you can write the function here.
 # e.g.
 #slack-send-raw()
 #{
@@ -19,9 +19,9 @@ source ${HOME}/.bash_profile;
 #pinkie-send()
 #{
 #    curl -X POST        \
-#	 -F "title=$1"    \
-#	 -F "data=$2"     \
-#	 https://YOUR_URL_OF_RECEIVING_UPDATE/eat-my-update;
+#    -F "title=$1"    \
+#    -F "data=$2"     \
+#    https://YOUR_URL_OF_RECEIVING_UPDATE/eat-my-update;
 #}
 
 export trace_file=$SCRIPTPATH/rate.txt;
@@ -33,7 +33,13 @@ export TIMEOUT="timeout --signal SIGINT 6h";
 # message part
 export BASE_URL='https://hare1039.nctu.me/sysvol';
 export IGNORE_MSG=('\n');
-export IGNORE_MSG_PATTERN=('.*伊莉.*txt.*'); # prevent any message that match these pattern to be post to slack
+# prevent any message that match these pattern to be post to slack
+export IGNORE_MSG_PATTERN=('.*伊莉.*txt.*');
+# Remove prefix that should not belong to url.
+# e.g. Downloaded '/mnt/NAS/video/magic/01.mp4'
+# but my url should look like http://server.com/video/magic/01.mp4
+# => RM_LOCALFS_PREFIX that should remove is '/mnt/NAS'
+export RM_LOCALFS_PREFIX='/mnt/NAS'
 
 # gdrivedl setup
 export GDRIVEDL_PY="${HOME}/Documents/git_projects/gdrivedl/dl.py";
