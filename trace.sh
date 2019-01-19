@@ -34,6 +34,7 @@ trap INT-handler INT
 
 SRC_DL_FUNC="source $SCRIPTPATH/dl-func.sh";
 list=$(cat $SCRIPTPATH/list.json);
+> ${line_buf_file} #clear error buffer
 
 for row in $(echo "${list}" | jq -r '.[] | @base64'); do
     _jq() {

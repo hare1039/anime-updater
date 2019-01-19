@@ -97,7 +97,7 @@ megadl-from()
     local mega_result=$(megadl --no-progress --print-names $* 2>&1);
     if grep -q 'ENOENT' <<< "$mega_result" ; then
         #   line "$title dl failed. Please renew the url. <<$*>>"
-        echo "$title dl failed. Please renew the url. <<$*>>" > $line_buf_file;
+        echo "$title dl failed. Please renew the url. <<$*>>" >> $line_buf_file;
         echo "$title download failed. Please renew the url. <<$*>>";
     fi
     if grep -q -v -E 'ERROR|WARNING' <<< "$mega_result"; then
