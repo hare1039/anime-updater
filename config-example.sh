@@ -45,3 +45,5 @@ export RM_LOCALFS_PREFIX='/mnt/NAS'
 export GDRIVEDL_PY="${HOME}/Documents/git_projects/gdrivedl/dl.py";
 export PYTHON3='python3';
 export GDRIVEDL_PY_SELENIUM_HOST='http://192.168.1.120:4444/wd/hub';
+
+export YOUTUBE_DL='youtube-dl'

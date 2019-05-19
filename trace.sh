@@ -47,6 +47,8 @@ for row in $(echo "${list}" | jq -r '.[] | @base64'); do
             $TIMEOUT bash -c "$SRC_DL_FUNC; megadl-from $url";
         elif [[ "$url" = *"google.com"* ]]; then
             $TIMEOUT bash -c "$SRC_DL_FUNC; gdrivedl-from $url";
+        elif [[ "$url" = *"youtube.com"* ]]; then
+            $TIMEOUT bash -c "$SRC_DL_FUNC; youtube-dl-from $url";
         fi
         cd ${HOME};
     done

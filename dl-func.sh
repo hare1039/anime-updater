@@ -122,3 +122,33 @@ megadl-from()
     cd ${HOME};
     return $err;
 }
+
+youtube-dl-from()
+{
+    local title=${PWD##*/};
+    local err=$ERROR_CODE;
+    if [[ "${PWD}" == "${HOME}" ]]; then
+        return $err;
+    fi
+    echo "downloading: $title";
+
+    local result=$(${YOUTUBE_DL} --download-archive ytdl.cache \
+                                 --no-post-overwrites \
+                                 --no-progress \
+                                 --no-warnings "$*" 2>&1);
+
+    local filename_cat='';
+    while read -r line; do
+        if grep -q "ffmpeg" <<< "$line"; then
+            local filename=$(echo $line | awk 'split($0, a, "\"") {$6 = a[2]} {print $6}');
+            filename_cat="$filename_cat\n$filename";
+        fi
+    done <<< "${result}"
+
+    slack-send "$PWD" "$filename_cat"
+    echo "$title have updated";
+    err=0;
+
+    cd ${HOME};
+    return $err;
+}
