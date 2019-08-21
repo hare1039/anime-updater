@@ -100,7 +100,7 @@ megadl-from()
         echo "$title dl failed. Please renew the url. <<$*>>" >> $line_buf_file;
         echo "$title download failed. Please renew the url. <<$*>>";
     fi
-    if grep -q -v -E 'ERROR|WARNING' <<< "$mega_result"; then
+    if grep -q -v -E 'ERROR|WARNING|no_such_file' <<< "$mega_result"; then
         local rawname=$(grep -v -E 'ERROR|WARNING' <<< "$mega_result");
         local filename_cat='';
         local folder='';
@@ -142,6 +142,36 @@ youtube-dl-from()
         if grep -q "ffmpeg" <<< "$line"; then
             local filename=$(echo $line | awk 'split($0, a, "\"") {$6 = a[2]} {print $6}');
             filename_cat="$filename_cat\n$filename";
+        fi
+    done <<< "${result}"
+
+    slack-send "$PWD" "$filename_cat"
+    echo "$title have updated";
+    err=0;
+
+    cd ${HOME};
+    return $err;
+}
+
+iwara-dl-from()
+{
+    local title=${PWD##*/};
+    local err=$ERROR_CODE;
+    if [[ "${PWD}" == "${HOME}" ]]; then
+        return $err;
+    fi
+    echo "downloading: $title";
+
+    local result=$(iwara-dl -d);
+
+    local filename_cat='';
+    while read -r line; do
+        if [[ "$line" == *'[['*']]'* ]]; then
+            author_name="$line"
+        fi
+        local filename=$(echo $line | grep 'DL');
+        if [[ "$filename" != "" ]]; then
+            filename_cat="$filename_cat\n${author_name}:${filename:4}";
         fi
     done <<< "${result}"
 

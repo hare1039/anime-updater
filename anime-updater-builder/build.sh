@@ -26,7 +26,7 @@ echo "---"
 tee ./anime-updater/Caddyfile <<EOF
 :80 {
     gzip
-    root /mnt
+    root /dl
     browse
     proxy /AnimeUpdate http://slack:8027
     log stdout
@@ -40,49 +40,25 @@ echo "P.S. No need to modify the :80 part. Script will redirect port ${HTTP_PORT
 echo ""
 read -p "Script paused. [Enter] to continue. " INPUT
 
-
-read -p "Expose VNC port in selenium? [default=5900, 0 for not open] " INPUT
-
-if [[ "$INPUT" == "" ]]; then
-    SELENIUM_PORTS_LINE1='    ports:'
-    SELENIUM_PORTS_LINE2='      - "5900:5900"'
-    echo "VNC Password is 'secret'"
-elif [[ "$INPUT" == "0" ]]; then
-    SELENIUM_PORTS_LINE1=""
-    SELENIUM_PORTS_LINE2=""
-else
-    SELENIUM_PORTS_LINE1='    ports:'
-    SELENIUM_PORTS_LINE2="      - '$INPUT:5900'"
-    echo "VNC Password is 'secret'"
-fi
-
-echo "---"
 tee docker-compose.yml <<EOF
 version: "2"
 services:
   anime-updater:
     build: ./anime-updater
+    restart: always
     ports:
       - "${HTTP_PORT}:80"
     volumes:
       - "${ANIME_UPDATER_DIR}:/anime-updater"
-      - "${DL_DIR}:/mnt"
+      - "${DL_DIR}:/dl"
     container_name: anime-updater
   db:
     image: mongo
+    restart: always
     container_name: anime-updater-db
-
-  selenium:
-    image: selenium/standalone-firefox-debug:3.14.0-europium
-    volumes:
-      - "${DL_DIR}:/mnt"
-      - "/dev/shm:/dev/shm"
-    container_name: anime-updater-selenium
-${SELENIUM_PORTS_LINE1}
-${SELENIUM_PORTS_LINE2}
-
   slack:
     image: hare1039/anime-updater-bot
+    restart: always
     volumes:
       - "${ANIME_UPDATER_DIR}/bot-server:/bot-server"
     container_name: anime-updater-slack-server
@@ -137,15 +113,15 @@ slack-send-raw()
 {
     curl -X POST                             \
          -H 'Content-type: application/json' \
-         --data "\$*"                         \
+         --data "\$*"                        \
          ${WEBHOOK_URL}
 }
 
 pinkie-send()
 {
-    curl -X POST        \
-     -F "title=\$1"       \
-     -F "data=\$2"        \
+    curl -X POST    \
+     -F "title=\$1" \
+     -F "data=\$2"  \
      http://slack/AnimeUpdate/eat-my-update;
 }
 
@@ -166,11 +142,10 @@ export IGNORE_MSG_PATTERN=('.*伊莉.*txt.*');
 # => RM_LOCALFS_PREFIX that should remove is '/mnt/NAS'
 export RM_LOCALFS_PREFIX='/mnt'
 
-# gdrivedl setup
-export GDRIVEDL_PY="/gdrivedl/dl.py";
-export PYTHON3='python3';
-export GDRIVEDL_PY_SELENIUM_HOST='http://selenium:4444/wd/hub';
-
+# iwara-setup
+export IWARA_USER=""
+export IWARA_PASS=""
+alias iwara-dl='/iwara-dl/iwara-dl.sh'
 EOF
 echo "---"
 echo "Here is your ANIME_UPDATER/config.sh look like"
